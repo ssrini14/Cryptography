@@ -1,4 +1,5 @@
 \documentclass[letterpaper,notitlepage]{article}
+\pagestyle{empty}
 
 \title{Cryptography Final Project Proposal\\Team insert team name\\ HIGHT Algorithm}
 \author{Christopher Sasarak\\ Srivinas Sridharan}
@@ -6,6 +7,42 @@
 
 \begin{document}
 \maketitle
+\thispagestyle{empty}
+
+\section*{Team Information}
+\begin{description}
+    \item[Algorithm:] HIGHT
+    \item[Team Name:] New HIGHT
+    \item[Team Members:] Christopher Sasarak, Srinivas Sridharan   
+    \item[Email Addresses:] cms5347@rit.edu, sxs9716@rit.edu
+\end{description}
+
+\section*{Algorithm}
+The HIGHT algorithm\cite{hight} is a lightweight block cipher made for use in simple devices
+such as RFID tag. Its simple design lends itself to implementations
+not only in software, but also directly in hardware. Indeed, the authors note 
+that their hardware implementation of HIGHT can be implemented with only 3048 logic
+gates \cite{hight}. Other researchers have also evaluated HIGHT for its viability
+in low-power environments and reached the same conclusion 
+\cite{hight_implementation}.
+
+HIGHT divides the plain-text into blocks of 64-bits in length and then encrypts
+the data using a key of length 128-bits. Before performing the actual encryption, 
+HIGHT employs a technique called \emph{key whitening} where it uses whitening
+keys generated from the master key to do an initial transformation on the 
+plain-text before encrypting it with a 32-round algorithm. At the end of the
+encryption, the text output from these 32 rounds are put through an output
+transformation using a different set of whitening keys \cite{hight}.
+
+\section*{Attack}
+We are planning to implement a linear attack against one round of HIGHT.
+To do this we will need to find out three pieces of information:the sub-keys that 
+are used to encrypt the plain-text and the whitening keys used for both the
+input transformation and the output transformation. By testing many different 
+known plain-text/cipher-text pairs and exhaustively checking combinations of 
+whitening keys we can determine the sub-keys and break the encryption.
 
 
+\bibliographystyle{plain}
+\bibliography{bibliography}
 \end{document}
