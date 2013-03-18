@@ -8,7 +8,7 @@
  * HIGHT block cipher. 
 */ 
 public class HIGHT implements BlockCipher{
-    public static final int BLOCK_SIZE = 128, KEY_SIZE = 64, 
+    public static final int BLOCK_SIZE = 128, KEY_SIZE = 128, 
         DEFAULT_ROUNDS = 32;
 
     private int rounds, keySize, blockSize;
@@ -22,18 +22,41 @@ public class HIGHT implements BlockCipher{
      * @param rounds The number of rounds to run. 
      */
     public HIGHT(byte[] key, int rounds){
-        this.key = key;
+        this.setKey(key);
         this.rounds = rounds;
     }
     
     /**
-     * This constructor takes no arguments and will set the HIGHT
-     * object to use the default values described in the HIGHT paper.
-     * NOTE: The key needs to be specified separately with the setKey method.
+     * This constructor only a key and will set the HIGHT
+     * object to use the default number of rounds as described in the 
+     * HIGHT paper.
+     *
+     * @param key A byte array of the 128-bit master key.
      */
-    public HIGHT(){
-        this(null, HIGHT.DEFAULT_ROUNDS);
+    public HIGHT(byte[] key){
+        this(key, HIGHT.DEFAULT_ROUNDS);
     }
+
+    /**
+     * This function generates whitening keys from the input master key.
+     *
+     * @param mk The master key as an array of bytes.
+     * @return byte[] An array of whitening keys. 
+     */
+    // TODO: After testing, we should be able to make this private.
+    public byte[] generateWhiteningKeys(byte[] mk) {
+        byte[] wk = new byte[8];
+
+        for(int i = 0; i < 8; i++){
+            if(i >= 0 && i <= 3)
+                wk[i] = mk[i+12];
+            else
+                wk[i] = mk[i-4]; 
+        }
+
+        return wk;
+    }
+    
 
     /**
 	 * Returns this block cipher's block size in bytes.
@@ -71,8 +94,8 @@ public class HIGHT implements BlockCipher{
 	 * @param  key  Key.
 	 */
 	public void setKey(byte[] key){
-        // TODO: Set the whitening keys as well when a new key is set
         this.key = key;   
+        this.wKeys = this.generateWhiteningKeys(this.key);
     }
 
 	/**

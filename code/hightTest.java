@@ -16,7 +16,7 @@ public class hightTest{
      * using that key.
      */
     public static void main(String args[]){
-        byte[] bs = new byte[16];
+        byte[] key = new byte[16];
 
         if(args.length < 1){
             System.err.println(usage);
@@ -24,7 +24,7 @@ public class hightTest{
         }
         
         try{
-            bs = DatatypeConverter.parseHexBinary(args[0]);
+            key = DatatypeConverter.parseHexBinary(args[0]);
         }
         catch(NumberFormatException e){
             System.err.println(e.getMessage());
@@ -37,11 +37,30 @@ public class hightTest{
         
 
         // DO THINGS THAT ARE INTERESTING HERE!
-        String[] strs = convertBytes(bs);
-
+        String[] strs = convertBytes(key);
+        
+        System.out.println("Key bytes: ");
         for(String str : strs){
             System.out.println(str);
         }
+
+        System.out.println("Whitening keys: ");
+        strs = convertBytes(testWK(key));
+        for(String str : strs){
+            System.out.println(str);
+        }
+    }
+    
+    /**
+     * This method creates a HIGHT object and then calculates its whitening keys,
+     * returning them. 
+     *
+     * @param key A byte array of the master key.
+     * @return byte[] The resulting whitening keys.
+     */
+    public static byte[] testWK(byte[] key){
+        HIGHT h = new HIGHT(key);
+        return h.generateWhiteningKeys(key);
     }
 
     /**
