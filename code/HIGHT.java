@@ -41,8 +41,7 @@ public class HIGHT implements BlockCipher{
 	 * @return  Block size.
 	 */
 	public int blockSize(){
-        // TODO: Implement this stub
-        return 1;
+        return HIGHT.BLOCK_SIZE;
     }
 
 	/**
@@ -51,8 +50,7 @@ public class HIGHT implements BlockCipher{
 	 * @return  Key size.
 	 */
 	public int keySize(){
-        // TODO: Implement this stub
-        return 1;
+        return this.key.length;
     }
 
 	/**
@@ -62,8 +60,9 @@ public class HIGHT implements BlockCipher{
 	 *
 	 * @param  R  Number of rounds.
 	 */
-	public void setRounds
-		(int R){}
+	public void setRounds(int R){
+        this.rounds = R;
+    }
 
 	/**
 	 * Set the key for this block cipher. <TT>key</TT> must be an array of bytes
@@ -71,8 +70,10 @@ public class HIGHT implements BlockCipher{
 	 *
 	 * @param  key  Key.
 	 */
-	public void setKey
-		(byte[] key){}
+	public void setKey(byte[] key){
+        // TODO: Set the whitening keys as well when a new key is set
+        this.key = key;   
+    }
 
 	/**
 	 * Encrypt the given plaintext. <TT>text</TT> must be an array of bytes
