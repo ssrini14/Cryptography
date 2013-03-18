@@ -10,26 +10,21 @@ import javax.xml.bind.DatatypeConverter;
  */
 
 public class hightTest{
-    public static final String usage = "java hightTest <keySize> <key>"; 
+    public static final String usage = "java hightTest <key>"; 
     /*
-     * Test program takes a keysize (in bits) and a key and
-     * prints the byte array made from that key.
+     * Test program takes a hexadecimal key and prints out test information 
+     * using that key.
      */
     public static void main(String args[]){
-        byte[] bs = null;
-        int keySize = 0;
+        byte[] bs = new byte[16];
 
-        if(args.length < 2){
+        if(args.length < 1){
             System.err.println(usage);
             System.exit(1);
         }
         
         try{
-            keySize = Integer.parseInt(args[0]);
-            bs = new byte[keySize / 8];
-            
-            // Might need to add 1 if the keySize % 8 != 0
-            bs = DatatypeConverter.parseHexBinary(args[1]);
+            bs = DatatypeConverter.parseHexBinary(args[0]);
         }
         catch(NumberFormatException e){
             System.err.println(e.getMessage());
