@@ -42,10 +42,28 @@ public class hightTest{
         
 
         // DO THINGS THAT ARE INTERESTING HERE!
-        for(int i = 0; i < bs.length; i++){
-            // Should eventually come up with constants for these masks
-            System.out.println("" + ((int)bs[i] & 0x0000ff));
+        String[] strs = convertBytes(bs);
+
+        for(String str : strs){
+            System.out.println(str);
         }
+    }
+
+    /**
+     * This method will return an array of bytes represented as strings.
+     *
+     * @param bytes The bytes to convert.
+     * @return String[] The array of converted strings
+     */
+    public static String[] convertBytes(byte[] bytes){
+       String[] strs = new String[bytes.length]; 
+
+        for(int i = 0; i < bytes.length; i++){
+            // Should eventually come up with constants for these masks
+            strs[i] = "" + ((int)bytes[i] & 0x0000ff);
+        }
+
+        return strs;
     }
 }
 
