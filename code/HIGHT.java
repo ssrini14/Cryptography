@@ -10,8 +10,10 @@
 public class HIGHT implements BlockCipher{
     public static final int BLOCK_SIZE = 128, KEY_SIZE = 128, 
         DEFAULT_ROUNDS = 32;
+    public static final byte[] LFSRconsts = generateLFSRConsts();
+
     private int rounds, keySize, blockSize;
-    private byte[] key, wKeys, constStates, subkeys;
+    private byte[] key, wKeys, subkeys; 
 
     /**
      * This constructor will intialize this HIGHT object
@@ -61,7 +63,7 @@ public class HIGHT implements BlockCipher{
      *
      * @return The constants with respect to this.mk
      */
-    public byte[] constantGeneration(){
+    private static byte[] generateLFSRConsts(){
         byte[] states = new byte[128];
         states[0] = 0b1011010; 
             
