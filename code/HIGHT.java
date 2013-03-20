@@ -10,9 +10,8 @@
 public class HIGHT implements BlockCipher{
     public static final int BLOCK_SIZE = 128, KEY_SIZE = 128, 
         DEFAULT_ROUNDS = 32;
-
     private int rounds, keySize, blockSize;
-    private byte[] key, wKeys;
+    private byte[] key, wKeys, constStates, subkeys;
 
     /**
      * This constructor will intialize this HIGHT object
@@ -56,7 +55,29 @@ public class HIGHT implements BlockCipher{
 
         return wk;
     }
-    
+   
+    /**
+     * This function generates the 128 constant values used in subkey generation.
+     *
+     * @return The constants with respect to this.mk
+     */
+    public byte[] constantGeneration(){
+        byte[] states = new byte[128];
+        states[0] = 0b1011010; 
+            
+        for(int i = 1;;i++){
+            // LFSR represented by: x^7 + x^3 + 1
+            byte new_i = states[i-1] ;
+            states[i] = (byte)(((((new_i << 7) ^ (new_i << 3)) & 0x80) >>> 1) | (new_i >>> 1)); 
+
+            // This will end the function after one period, i.e. 2^7 - 1 = 127
+            if(states[i] == states[0])
+                break;
+            
+        }
+
+        return states;
+    }
 
     /**
 	 * Returns this block cipher's block size in bytes.

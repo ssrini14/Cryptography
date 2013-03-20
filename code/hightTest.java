@@ -49,8 +49,27 @@ public class hightTest{
         for(String str : strs){
             System.out.println(str);
         }
+
+        strs = convertBytes(testLFSR(key));
+        System.out.println("LFSR constants: ");
+        for(String str : strs){
+            System.out.println(str);
+        }
+
     }
     
+    /**
+     * This method creates a HIGHT object and then calculates the LFSR constants.
+     * This is not dependent on key.
+     *
+     *@param key The key to give to the HIGHT object.
+     *@return byte[] The LFSR state bytes.
+     */
+    public static byte[] testLFSR(byte[] key){
+        HIGHT h = new HIGHT(key); 
+        return h.constantGeneration();
+    }
+
     /**
      * This method creates a HIGHT object and then calculates its whitening keys,
      * returning them. 
@@ -74,7 +93,7 @@ public class hightTest{
 
         for(int i = 0; i < bytes.length; i++){
             // Should eventually come up with constants for these masks
-            strs[i] = "" + ((int)bytes[i] & 0x0000ff);
+            strs[i] = "" + ((short)bytes[i] & 0x00ff);
         }
 
         return strs;
