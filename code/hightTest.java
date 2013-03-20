@@ -37,7 +37,7 @@ public class hightTest{
         
 
         // DO THINGS THAT ARE INTERESTING HERE!
-        String[] strs = convertBytes(key);
+        String[] strs = bytesToString(key);
         
         System.out.println("Key bytes: ");
         for(String str : strs){
@@ -45,14 +45,14 @@ public class hightTest{
         }
 
         System.out.println("Whitening keys: ");
-        strs = convertBytes(testWK(key));
+        strs = bytesToString(testWK(key));
         for(String str : strs){
             System.out.println(str);
         }
 
         // Uncomment testLFSR and make generateLFSRConsts public in HIGHT
         // to test.
-        // strs = convertBytes(testLFSR(key));
+        // strs = bytesToString(testLFSR(key));
         // System.out.println("LFSR constants: ");
         // for(String str : strs){
         //     System.out.println(str);
@@ -90,7 +90,7 @@ public class hightTest{
      * @param bytes The bytes to convert.
      * @return String[] The array of converted strings
      */
-    public static String[] convertBytes(byte[] bytes){
+    public static String[] bytesToString(byte[] bytes){
        String[] strs = new String[bytes.length]; 
 
         for(int i = 0; i < bytes.length; i++){
