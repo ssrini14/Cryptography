@@ -44,19 +44,19 @@ public class hightTest{
             System.out.println(str);
         }
 
-        System.out.println("Whitening keys: ");
-        strs = bytesToString(testWK(key));
-        for(String str : strs){
-            System.out.println(str);
-        }
-
-        // Uncomment testLFSR and make generateLFSRConsts public in HIGHT
-        // to test.
-        // strs = bytesToString(testLFSR(key));
-        // System.out.println("LFSR constants: ");
+        // System.out.println("Whitening keys: ");
+        // strs = bytesToString(testWK(key));
         // for(String str : strs){
         //     System.out.println(str);
         // }
+
+        // Uncomment testLFSR and make generateLFSRConsts public in HIGHT
+        // to test.
+         strs = bytesToString(testLFSR(key));
+         System.out.println("LFSR constants: ");
+         for(String str : strs){
+             System.out.println(str);
+         }
 
     }
     
@@ -67,10 +67,10 @@ public class hightTest{
      *@param key The key to give to the HIGHT object.
      *@return byte[] The LFSR state bytes.
      */
-    // public static byte[] testLFSR(byte[] key){
-    //     HIGHT h = new HIGHT(key); 
-    //     return h.generateLFSRConsts();
-    // }
+     public static byte[] testLFSR(byte[] key){
+         HIGHT h = new HIGHT(key); 
+         return h.generateLFSRConsts();
+     }
 
     /**
      * This method creates a HIGHT object and then calculates its whitening keys,

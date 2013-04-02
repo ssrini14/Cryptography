@@ -10,6 +10,8 @@
 public class HIGHT implements BlockCipher{
     public static final int BLOCK_SIZE = 128, KEY_SIZE = 128, 
         DEFAULT_ROUNDS = 32;
+
+    // This could be made even faster by putting this as a literal value
     public static final byte[] LFSRconsts = generateLFSRConsts();
 
     private int rounds, keySize, blockSize;
@@ -63,14 +65,16 @@ public class HIGHT implements BlockCipher{
      *
      * @return The constants with respect to this.mk
      */
-    private static byte[] generateLFSRConsts(){
+    public static byte[] generateLFSRConsts(){
         byte[] states = new byte[128];
         states[0] = 0b1011010; 
             
         for(int i = 1;;i++){
             // LFSR represented by: x^7 + x^3 + 1
             byte new_i = states[i-1] ;
-            states[i] = (byte)(((((new_i << 7) ^ (new_i << 3)) & 0x80) >>> 1) | (new_i >>> 1)); 
+            // Calculate the new state and truncate to the 7 LSB
+            states[i] = (byte)(((((new_i << 6) ^ (new_i << 2)) & 0x40)) | (new_i
+            >>> 1));
 
             // This will end the function after one period, i.e. 2^7 - 1 = 127
             if(states[i] == states[0])
@@ -118,7 +122,7 @@ public class HIGHT implements BlockCipher{
 	 */
 	public void setKey(byte[] key){
         this.key = key;   
-        this.wKeys = this.generateWhiteningKeys(this.key);
+        //this.wKeys = this.generateWhiteningKeys(this.key);
     }
 
 	/**
