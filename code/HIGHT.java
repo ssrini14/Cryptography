@@ -47,9 +47,8 @@ public class HIGHT implements BlockCipher{
      * @return byte[] An array of whitening keys. 
      */
     // TODO: After testing, we should be able to make this private.
-    public byte[] generateWhiteningKeys(byte[] mk) {
+    public static byte[] generateWhiteningKeys(byte[] mk) {
         byte[] wk = new byte[8];
-
         for(int i = 0; i < 8; i++){
             if(i >= 0 && i <= 3)
                 wk[i] = mk[i+12];
@@ -116,13 +115,13 @@ public class HIGHT implements BlockCipher{
 
 	/**
 	 * Set the key for this block cipher. <TT>key</TT> must be an array of bytes
-	 * whose length is equal to <TT>keySize()</TT>.
+	 * whose length is 128 bits.
 	 *
 	 * @param  key  Key.
 	 */
 	public void setKey(byte[] key){
         this.key = key;   
-        //this.wKeys = this.generateWhiteningKeys(this.key);
+        this.wKeys = generateWhiteningKeys(this.key);
     }
 
 	/**

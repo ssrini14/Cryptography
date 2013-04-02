@@ -81,7 +81,7 @@ public class hightTest{
      */
     public static byte[] testWK(byte[] key){
         HIGHT h = new HIGHT(key);
-        return h.generateWhiteningKeys(key);
+        return HIGHT.generateWhiteningKeys(key);
     }
 
     /**
