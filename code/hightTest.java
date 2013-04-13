@@ -17,6 +17,8 @@ public class hightTest{
      */
     public static void main(String args[]){
         byte[] key = new byte[16];
+        HIGHT h;
+        String[] strs;
 
         if(args.length < 1){
             System.err.println(usage);
@@ -24,6 +26,7 @@ public class hightTest{
         }
         
         try{
+            // TODO: Use the parallel java library for this
             key = DatatypeConverter.parseHexBinary(args[0]);
         }
         catch(NumberFormatException e){
@@ -35,70 +38,20 @@ public class hightTest{
             System.exit(1);
         }
         
-
-        // DO THINGS THAT ARE INTERESTING HERE!
-        String[] strs = bytesToString(key);
+        h = new HIGHT(key);
         
         System.out.println("Key bytes: ");
-        for(String str : strs){
-            System.out.println(str);
+        System.out.println(DatatypeConverter.printHexBinary(key));
+
+        System.out.println("Whitening keys: ");
+        System.out.println(DatatypeConverter.printHexBinary(h.wKeys));
+
+        System.out.println("Subkeys: " );
+        for(int i = 3; i < 128; i += 4){ System.out.printf("skeys %d-%d: %02x%02x%02x%02x\n", 
+                i, i - 3, h.subkeys[i], h.subkeys[i-1],
+                h.subkeys[i-2], h.subkeys[i-3]);
         }
-
-        // System.out.println("Whitening keys: ");
-        // strs = bytesToString(testWK(key));
-        // for(String str : strs){
-        //     System.out.println(str);
-        // }
-
-        // Uncomment testLFSR and make generateLFSRConsts public in HIGHT
-        // to test.
-         strs = bytesToString(testLFSR(key));
-         System.out.println("LFSR constants: ");
-         for(String str : strs){
-             System.out.println(str);
-         }
-
     }
     
-    /**
-     * This method creates a HIGHT object and then calculates the LFSR constants.
-     * This is not dependent on key.
-     *
-     *@param key The key to give to the HIGHT object.
-     *@return byte[] The LFSR state bytes.
-     */
-     public static byte[] testLFSR(byte[] key){
-         HIGHT h = new HIGHT(key); 
-         return h.generateLFSRConsts();
-     }
-
-    /**
-     * This method creates a HIGHT object and then calculates its whitening keys,
-     * returning them. 
-     *
-     * @param key A byte array of the master key.
-     * @return byte[] The resulting whitening keys.
-     */
-    public static byte[] testWK(byte[] key){
-        HIGHT h = new HIGHT(key);
-        return HIGHT.generateWhiteningKeys(key);
-    }
-
-    /**
-     * This method will return an array of bytes represented as strings.
-     *
-     * @param bytes The bytes to convert.
-     * @return String[] The array of converted strings
-     */
-    public static String[] bytesToString(byte[] bytes){
-       String[] strs = new String[bytes.length]; 
-
-        for(int i = 0; i < bytes.length; i++){
-            // Should eventually come up with constants for these masks
-            strs[i] = "" + ((short)bytes[i] & 0x00ff);
-        }
-
-        return strs;
-    }
 }
 

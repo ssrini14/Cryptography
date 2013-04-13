@@ -11,11 +11,29 @@ public class HIGHT implements BlockCipher{
     public static final int BLOCK_SIZE = 128, KEY_SIZE = 128, 
         DEFAULT_ROUNDS = 32;
 
-    // This could be made even faster by putting this as a literal value
-    public static final byte[] LFSRconsts = generateLFSRConsts();
-
+    // This could be made faster by putting this as a literal value
+    public static final byte[] LFSRconsts;
     private int rounds, keySize, blockSize;
-    private byte[] key, wKeys, subkeys; 
+    public byte[] key, wKeys, subkeys; 
+
+    /**
+     * This generates the 128 constant values used in subkey generation.
+     */
+    static {
+        LFSRconsts = new byte[128];
+        LFSRconsts[0] = 0b1011010; 
+       
+        for(int i = 1;; i++){
+           byte new_c = LFSRconsts[i - 1];
+           new_c = (byte)((((new_c << 3) ^ (new_c << 6)) & 0x40) | (new_c >>> 1));
+
+           if(new_c == LFSRconsts[0])
+               break;
+
+           LFSRconsts[i] = new_c;
+        }
+    }
+
 
     /**
      * This constructor will intialize this HIGHT object
@@ -59,31 +77,6 @@ public class HIGHT implements BlockCipher{
         return wk;
     }
    
-    /**
-     * This function generates the 128 constant values used in subkey generation.
-     *
-     * @return The constants with respect to this.mk
-     */
-    public static byte[] generateLFSRConsts(){
-        byte[] states = new byte[128];
-        states[0] = 0b1011010; 
-            
-        for(int i = 1;;i++){
-            // LFSR represented by: x^7 + x^3 + 1
-            byte new_i = states[i-1] ;
-            // Calculate the new state and truncate to the 7 LSB
-            states[i] = (byte)(((((new_i << 6) ^ (new_i << 2)) & 0x40)) | (new_i
-            >>> 1));
-
-            // This will end the function after one period, i.e. 2^7 - 1 = 127
-            if(states[i] == states[0])
-                break;
-            
-        }
-
-        return states;
-    }
-
     /**
 	 * Returns this block cipher's block size in bytes.
 	 *
