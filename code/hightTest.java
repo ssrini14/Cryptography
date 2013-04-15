@@ -41,7 +41,8 @@ public class hightTest{
         h = new HIGHT(key);
         
         System.out.println("Key bytes: ");
-        System.out.println(DatatypeConverter.printHexBinary(key));
+        h.setKey(key);
+        System.out.println(DatatypeConverter.printHexBinary(h.key));
 
         System.out.println("Whitening keys: ");
         System.out.println(DatatypeConverter.printHexBinary(h.wKeys));

@@ -73,7 +73,6 @@ public class HIGHT implements BlockCipher{
             else
                 wk[i] = mk[i-4]; 
         }
-
         return wk;
     }
    
@@ -113,8 +112,38 @@ public class HIGHT implements BlockCipher{
 	 * @param  key  Key.
 	 */
 	public void setKey(byte[] key){
-        this.key = key;   
+        /* 
+         * Reverse the subkey bytes so further transformation more
+         * closely match those described in the algorithm.
+         */
+        for(int i = 0; i < 16; i++){
+           this.key[i] = key[15 - i]; 
+        }
         this.wKeys = generateWhiteningKeys(this.key);
+        this.subkeys = generateSubkeys(this.key);
+    }
+
+    /*
+     * This function generates the round subkeys used by HIGHT from the 
+     * master key that is passed in. 
+     *
+     * @param mk The master key
+     * @return byte[] The 128 subkeys that will be used for encryption by HIGHT.
+     */
+    public byte[] generateSubkeys(byte[] mk){
+        byte[] sk = new byte[128];
+
+        for(int i = 0; i < 8; i++){
+            for(int j = 0; j < 8; j++){
+                sk[16 * i + j] = (byte)(mk[(j-i) & 0x7] + HIGHT.LFSRconsts[16 * i + j] & 0xff);
+            }
+            for(int j = 0; j < 8; j++){
+                sk[16 * i + j] = (byte)(mk[(j-i) & 0x7] + HIGHT.LFSRconsts[16 * i + j] & 0xff);
+                sk[16 * i + j + 8] = (byte)(mk[(j-i & 0x7) + 8] + HIGHT.LFSRconsts[16 * i + j + 8] & 0xff);
+            }
+        }
+
+        return sk;
     }
 
 	/**
@@ -130,3 +159,4 @@ public class HIGHT implements BlockCipher{
 		(byte[] text){}
 
 }
+
