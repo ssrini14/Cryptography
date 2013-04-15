@@ -10,17 +10,18 @@ import javax.xml.bind.DatatypeConverter;
  */
 
 public class hightTest{
-    public static final String usage = "java hightTest <key>"; 
+    public static final String usage = "java hightTest <key> <plaintext>"; 
     /*
      * Test program takes a hexadecimal key and prints out test information 
      * using that key.
      */
     public static void main(String args[]){
         byte[] key = new byte[16];
+        byte[] plaintext = new byte[8];
         HIGHT h;
         String[] strs;
 
-        if(args.length < 1){
+        if(args.length < 2){
             System.err.println(usage);
             System.exit(1);
         }
@@ -28,6 +29,7 @@ public class hightTest{
         try{
             // TODO: Use the parallel java library for this
             key = DatatypeConverter.parseHexBinary(args[0]);
+            plaintext = DatatypeConverter.parseHexBinary(args[1]);
         }
         catch(NumberFormatException e){
             System.err.println(e.getMessage());
@@ -52,7 +54,11 @@ public class hightTest{
                 i, i - 3, h.subkeys[i], h.subkeys[i-1],
                 h.subkeys[i-2], h.subkeys[i-3]);
         }
+
+        System.out.println("Initial transform: ");
+        h.encrypt(plaintext);
     }
+
     
 }
 

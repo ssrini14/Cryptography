@@ -3,6 +3,7 @@
  *          Srinivas Sridharan
  */
 
+import javax.xml.bind.DatatypeConverter;
 /**
  * This class provides an implementation of the
  * HIGHT block cipher. 
@@ -14,7 +15,7 @@ public class HIGHT implements BlockCipher{
     // This could be made faster by putting this as a literal value
     public static final byte[] LFSRconsts;
     private int rounds, keySize, blockSize;
-    public byte[] key, wKeys, subkeys; 
+    public byte[] key, wKeys, subkeys, plaintext; 
 
     /**
      * This generates the 128 constant values used in subkey generation.
@@ -43,6 +44,7 @@ public class HIGHT implements BlockCipher{
      * @param rounds The number of rounds to run. 
      */
     public HIGHT(byte[] key, int rounds){
+        this.key = new byte[16];
         this.setKey(key);
         this.rounds = rounds;
     }
@@ -64,7 +66,6 @@ public class HIGHT implements BlockCipher{
      * @param mk The master key as an array of bytes.
      * @return byte[] An array of whitening keys. 
      */
-    // TODO: After testing, we should be able to make this private.
     public static byte[] generateWhiteningKeys(byte[] mk) {
         byte[] wk = new byte[8];
         for(int i = 0; i < 8; i++){
@@ -167,7 +168,6 @@ public class HIGHT implements BlockCipher{
 
         return whitened;
     }
->>>>>>> 5f20c55... Made the whitening keys populate the array properly (backwards).
 
 	/**
 	 * Encrypt the given plaintext. <TT>text</TT> must be an array of bytes
