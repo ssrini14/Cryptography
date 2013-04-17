@@ -28,10 +28,10 @@ public class HIGHT implements BlockCipher{
            byte new_c = LFSRconsts[i - 1];
            new_c = (byte)((((new_c << 3) ^ (new_c << 6)) & 0x40) | (new_c >>> 1));
 
+           LFSRconsts[i] = new_c;
+
            if(new_c == LFSRconsts[0])
                break;
-
-           LFSRconsts[i] = new_c;
         }
     }
 
