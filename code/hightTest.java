@@ -27,7 +27,6 @@ public class hightTest{
         }
         
         try{
-            // TODO: Use the parallel java library for this
             key = DatatypeConverter.parseHexBinary(args[0]);
             plaintext = DatatypeConverter.parseHexBinary(args[1]);
         }
@@ -56,7 +55,7 @@ public class hightTest{
         }
 
         System.out.println("Initial transform: ");
-        h.encrypt(plaintext);
+        System.out.println(DatatypeConverter.printHexBinary(h.initialTransform(plaintext)));
     }
 
     
