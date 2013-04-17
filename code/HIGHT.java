@@ -168,6 +168,52 @@ public class HIGHT implements BlockCipher{
 
         return whitened;
     }
+    
+    /**
+     * This function is one part of the round function.
+     *
+     * @param text A byte of text to do the f0 transformation on.
+     * @return byte The byte resulting from applying f0 to text.
+     */
+    public static byte f0(byte text){
+        byte op1 = (byte)(((text & 0x80) >>> 7 | (text << 1)) & 0xff);
+        byte op2 = (byte)(((text & 0xc0) >>> 6) | (text << 2) & 0xff);
+        byte op3 = (byte)(((text & 0xfe) >>> 1) | (text << 7) & 0xff);
+
+        return (byte)(op1 ^ op2 ^ op3 & 0xff);
+
+    }
+
+    /**
+     * This function is one part of the round function.
+     *
+     * @param text A byte of text to do the f1 transformation on.
+     * @return byte The byte resulting from applying f1 to text.
+     */
+    public static byte f1(byte text){
+        byte op1 = (byte)(((text & 0xe0) >>> 5 | (text << 3)) & 0xff);
+        byte op2 = (byte)(((text & 0xf0) >>> 4) | (text << 4) & 0xff);
+        byte op3 = (byte)(((text & 0xfc) >>> 2) | (text << 6) & 0xff);
+
+        return (byte)(op1 ^ op2 ^ op3 & 0xff);
+
+    }
+
+    /**
+     * This function takes a byte of text and applies the round
+     * function to it this.rounds number of times.
+     *
+     * @param text The 8-bytes of text to do the round function on.
+     *
+     * @return byte[] The changed output text.
+     */
+    public byte[] performRounds(byte[] text){
+
+        // This is for a normal round, not i = 31
+        //text[0] = text[7] ^ (
+       
+        return text;
+    }
 
 	/**
 	 * Encrypt the given plaintext. <TT>text</TT> must be an array of bytes
@@ -178,8 +224,13 @@ public class HIGHT implements BlockCipher{
 	 *
 	 * @param  text  Plaintext (on input), ciphertext (on output).
 	 */
-	public void encrypt
-		(byte[] text){}
+	public void encrypt(byte[] text){
+        text = this.initialTransform(text);
 
+        // Now we can do our round functions
+        text = this.performRounds(text);
+
+    }
+    
 }
 
