@@ -145,6 +145,29 @@ public class HIGHT implements BlockCipher{
 
         return sk;
     }
+    
+    /**
+     * This function will perform an initial transformation on the given
+     * plaintext block using the whitening keys generated after running setKey.
+     *
+     * @param text The 64 bit block of text to perform an initial transform on.
+     * @return byte[] The 64 bit whitened plaintext.
+     */
+    public byte[] initialTransform(byte[] text){
+        byte[] whitened = new byte[8];
+         
+        whitened[7] = (byte)((text[0] + wKeys[0]) & 0xff); 
+        whitened[6] = text[1];
+        whitened[5] = (byte)((text[2] ^ wKeys[1]) & 0xff); 
+        whitened[4] = text[3];
+        whitened[3] = (byte)((text[4] + wKeys[2]) & 0xff); 
+        whitened[2] = text[5];
+        whitened[1] = (byte)((text[6] ^ wKeys[3]) & 0xff); 
+        whitened[0] = text[7];
+
+        return whitened;
+    }
+>>>>>>> 5f20c55... Made the whitening keys populate the array properly (backwards).
 
 	/**
 	 * Encrypt the given plaintext. <TT>text</TT> must be an array of bytes
