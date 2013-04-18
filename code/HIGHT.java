@@ -176,11 +176,11 @@ public class HIGHT implements BlockCipher{
      * @return byte The byte resulting from applying f0 to text.
      */
     public static byte f0(byte text){
-        byte op1 = (byte)(((text & 0x80) >>> 7 | (text << 1)) & 0xff);
-        byte op2 = (byte)(((text & 0xc0) >>> 6) | (text << 2) & 0xff);
-        byte op3 = (byte)(((text & 0xfe) >>> 1) | (text << 7) & 0xff);
+        byte op1 = (byte)((text << 1) | (text >>> 7));
+        byte op2 = (byte)((text << 2) | (text >>> 6));
+        byte op3 = (byte)((text << 7) | (text >>> 1));
 
-        return (byte)(op1 ^ op2 ^ op3 & 0xff);
+        return (byte)(op1 ^ op2 ^ op3);
 
     }
 
@@ -191,11 +191,11 @@ public class HIGHT implements BlockCipher{
      * @return byte The byte resulting from applying f1 to text.
      */
     public static byte f1(byte text){
-        byte op1 = (byte)(((text & 0xe0) >>> 5 | (text << 3)) & 0xff);
-        byte op2 = (byte)(((text & 0xf0) >>> 4) | (text << 4) & 0xff);
-        byte op3 = (byte)(((text & 0xfc) >>> 2) | (text << 6) & 0xff);
+        byte op1 = (byte)((text << 3) | (text >>> 5));
+        byte op2 = (byte)((text << 4) | (text >>> 4));
+        byte op3 = (byte)((text << 6) | (text >>> 2));
 
-        return (byte)(op1 ^ op2 ^ op3 & 0xff);
+        return (byte)(op1 ^ op2 ^ op3);
 
     }
 
@@ -208,11 +208,20 @@ public class HIGHT implements BlockCipher{
      * @return byte[] The changed output text.
      */
     public byte[] performRounds(byte[] text){
-
+        byte[] new_text = new byte[8];
         // This is for a normal round, not i = 31
-        //text[0] = text[7] ^ (
+        int i = 0;
+        new_text[6] = text[7];
+        new_text[4] = text[5];
+        new_text[2] = text[3];
+        new_text[0] = text[1];
+
+        new_text[7] = (byte)(text[0] ^ (f0(text[1]) + subkeys[4*i+3] & 0xff)); 
+        new_text[5] = (byte)((text[6] + (f1(text[7]) ^ subkeys[4*i])) & 0xff);
+        new_text[3] = (byte)(text[4] ^ (f0(text[5]) + subkeys[4*i+1] & 0xff)); 
+        new_text[1] = (byte)((text[2] + (f1(text[3]) ^ subkeys[4*i+2])) & 0xff); 
        
-        return text;
+        return new_text;
     }
 
 	/**
@@ -229,6 +238,9 @@ public class HIGHT implements BlockCipher{
 
         // Now we can do our round functions
         text = this.performRounds(text);
+
+        System.out.println("Round 0: ");
+        System.out.println(DatatypeConverter.printHexBinary(text));
 
     }
     

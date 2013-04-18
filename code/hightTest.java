@@ -56,6 +56,8 @@ public class hightTest{
 
         System.out.println("Initial transform: ");
         System.out.println(DatatypeConverter.printHexBinary(h.initialTransform(plaintext)));
+
+        h.encrypt(plaintext);
     }
 
     
