@@ -22,7 +22,7 @@ classdef Hight < handle
             KeySize = 16;
             %val = Hgt.KeySize;
         end
-        
+
         function [WK] = getWhiteningKey(KeyHex)
             
             WKHex = KeyHex(1:16);
@@ -38,9 +38,9 @@ classdef Hight < handle
                 WKHex(indexD-1:indexD) = KeyHex(indexS-1:indexS);
             end
             WK = Hight.HextoBin(WKHex);
-        end
+        end 
         
-        function [SK] = subKeyGeneration(Key)
+      function [SK] = subKeyGeneration(Key)
             
             d{1,128} = {};
             SK{1,128} = {};
@@ -58,11 +58,11 @@ classdef Hight < handle
                     index1 = 8 *(16 -mod((incr3-incr2),8));
                     index2 = 8 *(8-mod((incr3-incr2),8));
                     SK{(16*(incr2-1)) + incr3} = Hight.addMod8...
-                        (Key(index1-7:index1),d{16*(incr2-1) + incr3});
+                            (Key(index1-7:index1),d{16*(incr2-1) + incr3});
                     SK{(16*(incr2-1)) +incr3+8} = Hight.addMod8...
-                        (Key(index2-7:index2),d{16*(incr2-1) + incr3 +8});
+                         (Key(index2-7:index2),d{16*(incr2-1) + incr3 +8});
                 end
-            end
+            end            
         end
         
         %Method - shiftBits
@@ -233,7 +233,7 @@ classdef Hight < handle
             
             outputBit(strfind(outputBit,' ')) = [];
             
-        end
+        end           
         
         function [F0] = roundFunc0(X)
             
@@ -242,7 +242,7 @@ classdef Hight < handle
             X12 = Hight.computeBitXOr(X1,X2);
             X7 = Hight.shiftBits(X,-7);
             F0 = Hight.computeBitXOr(X12,X7);
-        end
+        end        
         
         function [F1] = roundFunc1(X)
             
@@ -264,7 +264,7 @@ classdef Hight < handle
         end
         
         function setRounds(Hgt,inputRound)
-            Hgt.round = inputRound;
+            Hgt.round = inputRound;            
         end
         
         function setKey(Hgt,inputKey)
@@ -292,7 +292,7 @@ classdef Hight < handle
             PTHex(isspace(PTHex)) = [];
             KeyHex(isspace(KeyHex)) = [];
             
-        end
+        end        
         
         function [CT,CTHex,inputPT,PTHex] = encrypt(Hgt,inputPT)
             
@@ -301,7 +301,7 @@ classdef Hight < handle
             WK = Hight.getWhiteningKey(KeyHex);
             KeyBin = Hight.HextoBin(KeyHex);
             SK = Hight.subKeyGeneration(KeyBin);
-            PTBin =  Hight.HextoBin(PTHex);
+            PTBin =  Hight.HextoBin(PTHex);            
             
             X = PTBin;
             
@@ -319,16 +319,16 @@ classdef Hight < handle
             for incr1 = 1:1:Hgt.round
                 Xnew(1:8) = X(9:16);
                 Xnew(9:16) = Hight.addMod8(X(17:24),Hight.computeBitXOr...
-                    (Hight.roundFunc1(X(25:32)),SK{4*(incr1-1)+3}));
+                          (Hight.roundFunc1(X(25:32)),SK{4*(incr1-1)+3}));
                 Xnew(17:24) = X(25:32);
                 Xnew(25:32) = Hight.computeBitXOr(X(33:40),Hight.addMod8...
-                    (Hight.roundFunc0(X(41:48)),SK{4*(incr1-1)+2}));
+                           (Hight.roundFunc0(X(41:48)),SK{4*(incr1-1)+2}));
                 Xnew(33:40) = X(41:48);
                 Xnew(41:48) = Hight.addMod8(X(49:56),Hight.computeBitXOr...
-                    (Hight.roundFunc1(X(57:64)),SK{4*(incr1-1)+1}));
+                           (Hight.roundFunc1(X(57:64)),SK{4*(incr1-1)+1}));
                 Xnew(49:56) = X(57:64);
                 Xnew(57:64) = Hight.computeBitXOr(X(1:8),Hight.addMod8...
-                    (Hight.roundFunc0(X(9:16)),SK{4*(incr1-1)+4}));
+                           (Hight.roundFunc0(X(9:16)),SK{4*(incr1-1)+4}));
                 X = Xnew;
             end
             
@@ -349,7 +349,7 @@ classdef Hight < handle
                 
             end
             
-            CTHex = Hight.BintoHex(Xnew);
+            CTHex = Hight.BintoHex(Xnew);            
             CT = hex2dec(reshape(CTHex,2,[]).');
         end
         
@@ -379,16 +379,16 @@ classdef Hight < handle
             %Last Iteration of encrption
             
             Xnew(1:8) = Hight.computeBitXOr(X(1:8),Hight.addMod8...
-                (Hight.roundFunc0(X(9:16)),SK{128}));
+                                      (Hight.roundFunc0(X(9:16)),SK{128}));
             Xnew(9:16) = X(9:16);
             Xnew(17:24) = Hight.subMod8(X(17:24),Hight.computeBitXOr...
-                (Hight.roundFunc1(X(25:32)),SK{127}));
+                                     (Hight.roundFunc1(X(25:32)),SK{127}));
             Xnew(25:32) = X(25:32);
             Xnew(33:40) = Hight.computeBitXOr(X(33:40),Hight.addMod8...
-                (Hight.roundFunc0(X(41:48)),SK{126}));
+                                     (Hight.roundFunc0(X(41:48)),SK{126}));
             Xnew(41:48) = X(41:48);
             Xnew(49:56) = Hight.subMod8(X(49:56),Hight.computeBitXOr...
-                (Hight.roundFunc1(X(57:64)),SK{125}));
+                                     (Hight.roundFunc1(X(57:64)),SK{125}));
             Xnew(57:64) = X(57:64);
             
             X = Xnew;
@@ -397,16 +397,16 @@ classdef Hight < handle
                 
                 Xnew(9:16) = X(1:8);
                 Xnew(17:24) = Hight.subMod8(X(9:16),Hight.computeBitXOr...
-                    (Hight.roundFunc1(X(17:24)),SK{4*(incr1-1)+3}));
+                           (Hight.roundFunc1(X(17:24)),SK{4*(incr1-1)+3}));
                 Xnew(25:32) = X(17:24);
                 Xnew(33:40) = Hight.computeBitXOr(X(25:32),Hight.addMod8...
-                    (Hight.roundFunc0(X(33:40)),SK{4*(incr1-1)+2}));
+                           (Hight.roundFunc0(X(33:40)),SK{4*(incr1-1)+2}));
                 Xnew(41:48) = X(33:40);
                 Xnew(49:56) = Hight.subMod8(X(41:48),Hight.computeBitXOr...
-                    (Hight.roundFunc1(X(49:56)),SK{4*(incr1-1)+1}));
+                           (Hight.roundFunc1(X(49:56)),SK{4*(incr1-1)+1}));
                 Xnew(57:64) = X(49:56);
                 Xnew(1:8) = Hight.computeBitXOr(X(57:64),Hight.addMod8...
-                    (Hight.roundFunc0(X(1:8)),SK{4*(incr1-1)+4}));
+                             (Hight.roundFunc0(X(1:8)),SK{4*(incr1-1)+4}));
                 
                 X = Xnew;
                 
@@ -428,7 +428,7 @@ classdef Hight < handle
             PTHex = Hight.BintoHex(Xnew);
             PT = hex2dec(reshape(PTHex,2,[]).');
         end
-        
+ 
         
     end
-end
+end    
