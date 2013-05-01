@@ -1,0 +1,19 @@
+\begin{thebibliography}{1}
+
+\bibitem{hight}
+Deukjo Hong, Jaechul Sung, Seokhie Hong, Jongin Lim, Sangjin Lee, Bonseok Koo,
+  Changhoon Lee, Donghoon Chang, Jesang Lee, Kitae Jeong, Hyun Kim, Jongsung
+  Kim, and Seongtaek Chee.
+\newblock Hight: A new block cipher suitable for low-resource device.
+\newblock In {\em Cryptographic Hardware and Embedded Systems - CHES 2006, 8th
+  International Workshop}, volume 4249 of {\em Lecture Notes in Computer
+  Science}, pages 46--59. Springer, 2006.
+
+\bibitem{hight_implementation}
+Woo~Kwon Koo, Hwaseong Lee, Yong~Ho Kim, and Dong~Hoon Lee.
+\newblock Implementation and analysis of new lightweight cryptographic
+  algorithm suitable for wireless sensor networks.
+\newblock In {\em Information Security and Assurance, 2008. ISA 2008.
+  International Conference on}, pages 73--76. IEEE, 2008.
+
+\end{thebibliography}
