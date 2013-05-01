@@ -1,6 +1,7 @@
 clc;
 clear;
-KeyHexArray = ['ff'; 'ff' ;'ff' ;'ff'; 'ff'; 'ff' ;'ff'; 'ff'; 'ff'; 'ff'; 'ff'; 'ff'; 'ff'; 'ff'; 'ff'; 'ff'];
+%01a3d965367112e6f482795093bc2633
+KeyHexArray = ['01'; 'a3' ;'d9' ;'65'; '36'; '71' ;'12'; 'e6'; 'f4'; '82'; '79'; '50'; '93'; 'bc'; '26'; '33'];
 fileName = reshape(KeyHexArray',1,[]).'.';
 Key =hex2dec(KeyHexArray);
 fid = fopen([fileName '.txt'], 'wt'); 

@@ -178,7 +178,11 @@ round = str2double(get(handles.RoundText,'String'));
 Hgt = Hight();
 Hgt.setRounds(round);
 Hgt.setKey(Key);
+if(valueEncryptRB)
 [CT,CTHex,inputPT,PTHex] = Hgt.encrypt(PT);
+else
+[CT,CTHex,inputPT,PTHex] = Hgt.decrypt(PT);  
+end    
 %[ CTHex ] = Hight(PTHex, KeyHex, round,operation);
 set(handles.outputText,'String',CTHex);
 
