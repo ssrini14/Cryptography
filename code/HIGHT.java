@@ -210,16 +210,20 @@ public class HIGHT implements BlockCipher{
     public byte[] performRounds(byte[] text){
         byte[] new_text = new byte[8];
         // This is for a normal round, not i = 31
-        int i = 0;
-        new_text[6] = text[7];
-        new_text[4] = text[5];
-        new_text[2] = text[3];
-        new_text[0] = text[1];
+        for(int i = 0; i < this.rounds - 1; i++){
+            new_text[6] = text[7];
+            new_text[4] = text[5];
+            new_text[2] = text[3];
+            new_text[0] = text[1];
 
-        new_text[7] = (byte)(text[0] ^ (f0(text[1]) + subkeys[4*i+3] & 0xff)); 
-        new_text[5] = (byte)((text[6] + (f1(text[7]) ^ subkeys[4*i])) & 0xff);
-        new_text[3] = (byte)(text[4] ^ (f0(text[5]) + subkeys[4*i+1] & 0xff)); 
-        new_text[1] = (byte)((text[2] + (f1(text[3]) ^ subkeys[4*i+2])) & 0xff); 
+            new_text[7] = (byte)(text[0] ^ (f0(text[1]) + subkeys[4*i+3] & 0xff)); 
+            new_text[5] = (byte)((text[6] + (f1(text[7]) ^ subkeys[4*i])) & 0xff);
+            new_text[3] = (byte)(text[4] ^ (f0(text[5]) + subkeys[4*i+1] & 0xff)); 
+            new_text[1] = (byte)((text[2] + (f1(text[3]) ^ subkeys[4*i+2])) & 0xff); 
+
+            System.out.printf("Round %d:\n %s\n", i, DatatypeConverter.printHexBinary(new_text));
+            text = new_text;
+        }
        
         return new_text;
     }
@@ -238,9 +242,6 @@ public class HIGHT implements BlockCipher{
 
         // Now we can do our round functions
         text = this.performRounds(text);
-
-        System.out.println("Round 0: ");
-        System.out.println(DatatypeConverter.printHexBinary(text));
 
     }
     
