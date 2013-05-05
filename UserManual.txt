@@ -1,0 +1,91 @@
+User's Manual - Team New Hight
+
+1. In the command window of Matlab execute the following commands for encryption
+
+   1.1. Hgt = Hight()	//create a new instance of the Hight Matlab class
+   1.2. Hgt.blockSize() //Get the block size for the Hight Cipher
+      
+        Output: = 8
+
+   1.3. Hgt.keySize()   //Get the key size for the Hight Cipher 
+
+        Output: = 16 
+
+   1.4. Hgt.setRounds(32) //set the number of Rounds for the Hight Cipher 
+   1.5. Key = [0;17;34;51;68;85;102;119;136;153;170;187;204;221;238;255] //set the byte value for key Key(1)=0 MSByte and Key(16)=255 LSByte in Hexadecimal = '00112233445566778899aabbccddeeff'
+   1.6. Hgt.setKey(Key) //set the key to the Hgt instance
+   1.7. PT = [0;0;0;0;0;0;0;0] //set the byte value for plain text in Hexadecimal = '0000000000000000' 
+   1.8. [CT CTHex] = Hgt.encrypt(PT)
+
+   Output:
+
+   CT = 
+
+    0
+   244
+    24
+   174
+   217
+    79
+     3
+   242
+
+   CTHex	
+
+   00F418AED94F03F2
+
+
+2. In the command window of Matlab execute the following commands for decryption (If the workspace is not cleared)
+
+   2.1. CT = [0;244;24;174;217;79;3;242];
+   2.2. [PT PTHex] = Hgt.decrypt(CT)
+ 
+   Output:	
+ 
+   PT =
+
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+
+
+   PTHex =
+
+   0000000000000000
+
+3. In the command window of Matlab execute the following commands for Hight GUI encryption
+
+   3.1. HightGUI()
+   
+   Output: 
+   
+   A GUI will be launched for Hight encryption and decryption
+
+   3.2. Enter the value '0011223344556677' in the field Plain Text (Hexadecimal) 
+   3.3. Enter the value 'FFEEDDCCBBAA99887766554433221100' in the field Key (Hexadecimal)
+   3.4. The round (integer) field is to set the number of rounds for Hight algorithm //Default is set to 32 
+   3.5. Choose the encryption process by clicking on the radio button encrypt
+   3.6. Click on the button Hight Operation
+
+   Output:
+ 
+   Cipher Text (Hexadecimal) =  23CE9F72E543E6D8
+
+4. In the command window of Matlab execute the following commands for Hight GUI decryption (In the same GUI window)
+
+   4.1. Choose the decryption process by clicking on the radio button decrypt
+   4.2  Enter the value '23CE9F72E543E6D8' in the field Cipher Text (Hexadecimal)
+   4.3. Enter the key as used in the encryption process 'FFEEDDCCBBAA99887766554433221100' in the field Key (Hexadecimal)
+   4.4. The number of rounds as entered during encryption process in the field round (integer)
+   4.5. Click on the button Hight Operation
+
+   Output:
+ 
+   Plain Text (Hexadecimal) =  0011223344556677
+   
+    

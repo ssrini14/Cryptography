@@ -1,3 +1,5 @@
+%Simple matlab GUI for Hight cipher
+
 function varargout = HightGUI(varargin)
 % HIGHTGUI MATLAB code for HightGUI.fig
 %      HIGHTGUI, by itself, creates a new HIGHTGUI or raises the existing
@@ -72,8 +74,7 @@ function varargout = HightGUI_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
-
-
+% --- Executes during callback of Plain/Cipher input text field
 function PlainText_Callback(hObject, eventdata, handles)
 % hObject    handle to PlainText (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -82,6 +83,7 @@ function PlainText_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of PlainText as text
 %        str2double(get(hObject,'String')) returns contents of PlainText as a double
 PTHex = get(hObject,'String');
+%Check if the values in the fields are Hexadecimal String
 capExpr = '[^0123456789ABCDEFabcdef\s]';
 capStartIndex = regexp(PTHex,capExpr, 'once');
 
@@ -89,9 +91,10 @@ if(~isempty(capStartIndex))
     h = msgbox('Incorrect Hexadecimal Format','Plain/Cipher Text','error');
     set(hObject,'String','');
 else
+    %Check the length of the Master key should be 8 bytes or 16 nibbles
     PTHex(isspace(PTHex)) = [];
     PTHexLen = length(PTHex);
-    if(PTHexLen < 1 || PTHexLen > 16)
+    if(PTHexLen ~= 16)
         h = msgbox('Plain text or Cipher text must be 64 Bits','Plain/Cipher Text','error');
         set(hObject,'String','');
     else
@@ -117,7 +120,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
+% --- Executes during callback of Key input text field
 function KeyText_Callback(hObject, eventdata, handles)
 % hObject    handle to KeyText (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -126,15 +129,17 @@ function KeyText_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of KeyText as text
 %        str2double(get(hObject,'String')) returns contents of KeyText as a double
 KeyHex = get(hObject,'String');
+%Check if the values in the fields are Hexadecimal String
 capExpr = '[^0123456789ABCDEFabcdef\s]';
 capStartIndex = regexp(KeyHex,capExpr, 'once');
 if(~isempty(capStartIndex))
     h = msgbox('Incorrect Hexadecimal Format','Key Text','error');
-    set(hObject,'String','');
+    set(hObject,'String','');    
 else
+    %Check the length of the Master key should be 16 bytes or 32 nibbles
     KeyHex(isspace(KeyHex)) = [];
     KeyHexLen = length(KeyHex);
-    if(KeyHexLen < 1 || KeyHexLen > 32)
+    if(KeyHexLen ~= 32)
         h = msgbox('Key text must be 128 Bits','Key Text','error');
         set(hObject,'String','');
     else
@@ -164,29 +169,36 @@ function HightOperBtn_Callback(hObject, eventdata, handles)
 % hObject    handle to HightOperBtn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+%Get the radio button encrypt
 valueEncryptRB = get(handles.EncryptRB,'Value');
-if(valueEncryptRB)
-    operation = 'encrypt';
-else
-    operation = 'decrypt';
-end
+
+%Get the user input for Plain text
 PTHex = get(handles.PlainText,'String');
+%Convert the plain text to byte array
 PT = hex2dec(reshape(PTHex,2,[]).');
+%Get the user input for Master key
 KeyHex = get(handles.KeyText,'String');
+%Convert the master key to byte array
 Key = hex2dec(reshape(KeyHex,2,[]).');
+%Get the number of rounds as integer
 round = str2double(get(handles.RoundText,'String'));
+
+%Create the instance of the Hight Class
 Hgt = Hight();
+%set the number of rounds and key
 Hgt.setRounds(round);
 Hgt.setKey(Key);
+
+%If radio button encrypt is clicked the perform encryption else decryption
 if(valueEncryptRB)
-[CT,CTHex,inputPT,PTHex] = Hgt.encrypt(PT);
+[OutText,OutTexHex] = Hgt.encrypt(PT);
 else
-[CT,CTHex,inputPT,PTHex] = Hgt.decrypt(PT);  
+[OutText,OutTexHex] = Hgt.decrypt(PT);  
 end    
-%[ CTHex ] = Hight(PTHex, KeyHex, round,operation);
-set(handles.outputText,'String',CTHex);
+set(handles.outputText,'String',OutTexHex);
 
-
+% --- Executes during call back of Rounds text input
 function RoundText_Callback(hObject, eventdata, handles)
 % hObject    handle to RoundText (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -194,16 +206,20 @@ function RoundText_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of RoundText as text
 %        str2double(get(hObject,'String')) returns contents of RoundText as a double
+
 roundStr = get(hObject,'String');
+%First check if the user input for Rounds is a number
 capExpr = '[^0123456789]';
 capStartIndex = regexp(roundStr,capExpr, 'once');
 if(~isempty(capStartIndex))
     h = msgbox('Round value must be an Integer','Round Value','error');
     set(hObject,'String','32');
 else
+    %check if the Rounds entered is within 1 and 32 
+    %Number of rounds cannot be negative, zero    
     round = str2double(get(hObject,'String'));
-    if(round < 1 || round > 32)
-        h = msgbox('Round of Hight must be 1-32','Round Value','error');
+    if(round < 1)
+        h = msgbox('Round of Hight must be greater than 1','Round Value','error');
         set(hObject,'String','32');
     end
 end
@@ -222,11 +238,14 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in EncryptRB.
+% --- Executes on button press in Encrypt Radio Button.
 function EncryptRB_Callback(hObject, eventdata, handles)
 % hObject    handle to EncryptRB (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+%When the decrypt radio button is clicked change the plain text label to
+%cipher text and vice versa
 valueEncryptRB = get(hObject,'Value');
 if(valueEncryptRB)
     set(handles.DecryptRB,'Value',0);
@@ -236,13 +255,16 @@ end
 % Hint: get(hObject,'Value') returns toggle state of EncryptRB
 
 
-% --- Executes on button press in DecryptRB.
+% --- Executes on button press in Decrypt Radio Button.
 function DecryptRB_Callback(hObject, eventdata, handles)
 % hObject    handle to DecryptRB (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of DecryptRB
+
+%When the decrypt radio button is clicked change the cipher text label to
+%cipher text and vice versa
 valueDecryptRB = get(hObject,'Value');
 if(valueDecryptRB)
     set(handles.EncryptRB,'Value',0);
