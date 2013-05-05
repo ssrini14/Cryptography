@@ -1,0 +1,4 @@
+Developer's Manual - Team New Hight
+
+1. Copy the files Hight.m, HightGUI.fig and HightGUI.m to the current workspace in Matlab
+2. Use Matlab 2009 and above. 
