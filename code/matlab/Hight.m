@@ -570,24 +570,7 @@ classdef Hight < handle
             %Swap at the end performed during encryption  - full round
             if(Hgt.round == 32)
                 X = [X(9:64) X(1:8)];
-            end            
-            
-            %Last Iteration of encrption
-            
-%             Xnew(1:8) = Hight.computeBitXOr(X(1:8),Hight.addMod8...
-%                 (Hight.roundFunc0(X(9:16)),SK{128}));
-%             Xnew(9:16) = X(9:16);
-%             Xnew(17:24) = Hight.subMod8(X(17:24),Hight.computeBitXOr...
-%                 (Hight.roundFunc1(X(25:32)),SK{127}));
-%             Xnew(25:32) = X(25:32);
-%             Xnew(33:40) = Hight.computeBitXOr(X(33:40),Hight.addMod8...
-%                 (Hight.roundFunc0(X(41:48)),SK{126}));
-%             Xnew(41:48) = X(41:48);
-%             Xnew(49:56) = Hight.subMod8(X(49:56),Hight.computeBitXOr...
-%                 (Hight.roundFunc1(X(57:64)),SK{125}));
-%             Xnew(57:64) = X(57:64);
-%             
-%             X = Xnew;
+            end                                    
 
             %Perform 32 rounds of the operation as per Hight specification
             %Refer http://tools.ietf.org/html/draft-kisa-hight-00
