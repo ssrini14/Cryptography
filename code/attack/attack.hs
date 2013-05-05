@@ -4,12 +4,14 @@
 module Main where
 import Data.Maybe
 import Data.List
+import Data.Bits
+import Data.Word
 import Numeric
 import System.Environment
 import System.IO
 
 type Pair = (String, String)     
-type PCPair = (Int, Int)
+type PCPair = (Word8, Word8)
 
 usage = "./attack <plaintext-ciphertext file>"
        
@@ -21,18 +23,19 @@ main = do args <- getArgs
             (do h <- openFile (head args) ReadMode
                 contents <- hGetContents h
                 let pairs = loadPairs contents
-                sequence_ $ map (\x -> do putStr (fst x) 
-                                          putStr ","
-                                          putStrLn (snd x)) pairs 
+                return ()
+                -- sequence_ $ map (\x -> do putStr (fst x) 
+                --                           putStr ","
+                --                           putStrLn (snd x)) pairs 
             )
 
 
-loadPairs :: String -> [Pair] 
-loadPairs inp = map parsePair $ lines inp   
+loadPairs :: String -> [[PCPair]] 
+loadPairs inp = map (makePCPairs . parsePair) $ lines inp   
 
--- Parse's a pair out of an individual line of text
+-- Parses a pair out of an individual line of text
 parsePair :: String -> Pair
-parsePair str = let (x, y) = span (not . (== ',')) str 
+parsePair str = let (x, y) = span (/= ',') str 
                 in
                 (x, tail y)
                 
@@ -53,5 +56,20 @@ makePCPairs (l, r) = let parseHex = fst . head . readHex
                          in
                              zip ls rs
 
+-- Find the first subkey byte from a plaintext ciphertext pair and a given
+-- whitening guess
+--getSubkey :: [PCPair] -> Int
+--getSubkey wk pairs = let c0 = snd $ last pairs
+--                         x7 = snd $ head pairs
+--                         x0 = (c0 - wk) `mod` 256
+--                         in
+
+-- Performs the f0 function on a byte
+f0 :: Word8 -> Word8
+f0 w = (rotate w 1) `xor` (rotate w 2) `xor` (rotate w 7)
+        
+-- Performs the f1 function on a byte
+f1 :: Word8 -> Word8
+f1 w = (rotate w 3) `xor` (rotate w 4) `xor` (rotate w 6)
 
 
