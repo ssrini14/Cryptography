@@ -24,6 +24,7 @@ main = do args <- getArgs
                 contents <- hGetContents h
                 let pairs = loadPairs contents
                 let sk = concat $ map (\x -> showHex x "") [findCorrectSK pairs x | x <- [4,3,2,1]]
+                --let sk = showHex (findCorrectSK pairs 4) "" 
                 putStrLn sk 
                 -- sequence_ $ map (\x -> do putStr (fst x) 
                 --                           putStr ","
@@ -81,10 +82,10 @@ getSubkeyEven wk pairs keyNo = let ca = snd $ pairs !! ((keyNo * 2 - 1) `mod` 8)
                                    -- Undo the last whitening performed on c
                                    ca' = (ca - wk)
                                    fOut = (f0 cb)
-                                   p = fst $ pairs !! ((keyNo * 2) `mod` 8)
+                                   p = fst $ pairs !! (keyNo * 2 `mod` 8)
                                    x' = ca' `xor` p
                                in 
-                                  (fOut - x')
+                                  (x' - fOut)
                          
 -- Find the a subkey byte from a plaintext ciphertext pair and a given
 -- whitening guess. You must specify the subkey to find, [1..4]. This function
@@ -108,5 +109,3 @@ f0 w = (rotate w 1) `xor` (rotate w 2) `xor` (rotate w 7)
 -- Performs the f1 function on a byte
 f1 :: Word8 -> Word8
 f1 w = (rotate w 3) `xor` (rotate w 4) `xor` (rotate w 6)
-
-
