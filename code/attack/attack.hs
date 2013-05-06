@@ -23,8 +23,8 @@ main = do args <- getArgs
             (do h <- openFile (head args) ReadMode
                 contents <- hGetContents h
                 let pairs = loadPairs contents
-                let sk = findCorrectSK $ tail pairs
-                putStrLn (showHex sk "")
+                let sk = concat $ map (\x -> showHex x "") [findCorrectSK pairs x | x <- [4,3,2,1]]
+                putStrLn sk 
                 -- sequence_ $ map (\x -> do putStr (fst x) 
                 --                           putStr ","
                 --                           putStrLn (snd x)) pairs 
@@ -57,17 +57,13 @@ makePCPairs (l, r) = let parseHex = fst . head . readHex
                          in
                              zip ls rs
 
-findCorrectSK :: [[PCPair]] -> Word8
-findCorrectSK pairs = let sks = [[getSubkey wk p 3 | p <- pairs] | wk <- possibleKeys]
-                          valid = [all (== (head sk)) sk | sk <- sks] 
-                          Just ind = elemIndex True valid
-                      in 
-                      head (sks !! ind)
-                      
-
--- Verify that this subkey is correct across all plaintext/ciphertext pairs
---verifySK3 :: Word8 -> [[PCPair]] -> Bool
---verifySK3 sk ps = all (== sk) [getSubkey sk x | x <- ps]
+-- Find the correct subkey no. b in the list of pairs.
+findCorrectSK :: [[PCPair]] -> Int -> Word8
+findCorrectSK pairs b = let sks = [[getSubkey wk p b | p <- pairs] | wk <- possibleKeys]
+                            valid = [all (== (head sk)) sk | sk <- sks] 
+                            Just ind = elemIndex True valid
+                        in 
+                          head (sks !! ind)
 
 -- Find the a subkey byte from a plaintext ciphertext pair and a given
 -- whitening guess. You must specify the subkey to find, [1..4].
@@ -84,8 +80,8 @@ getSubkeyEven wk pairs keyNo = let ca = snd $ pairs !! ((keyNo * 2 - 1) `mod` 8)
                                    cb = snd $ pairs !! (keyNo * 2 `mod` 8) -- 7th byte
                                    -- Undo the last whitening performed on c
                                    ca' = (ca - wk)
-                                   fOut = f0 cb
-                                   p = fst $ pairs !! (keyNo * 2 `mod` 8)
+                                   fOut = (f0 cb)
+                                   p = fst $ pairs !! ((keyNo * 2) `mod` 8)
                                    x' = ca' `xor` p
                                in 
                                   (fOut - x')
@@ -99,7 +95,7 @@ getSubkeyOdd wk pairs keyNo = let ca = snd $ pairs !! ((keyNo * 2 - 1) `mod` 8) 
                                   -- Undo the last whitening performed on c
                                   ca' = (ca `xor` wk)
                                   fOut = f1 cb
-                                  p = fst $ pairs !! (keyNo * 2 `mod` 8)
+                                  p = fst $ pairs !! ((keyNo * 2) `mod` 8)
                                   x' = ca' - p
                               in 
                                  (fOut `xor` x')
