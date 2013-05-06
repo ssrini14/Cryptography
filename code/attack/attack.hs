@@ -69,19 +69,23 @@ findCorrectSK pairs = let sks = [[getSubkey wk p 4 | p <- pairs] | wk <- possibl
 --verifySK3 :: Word8 -> [[PCPair]] -> Bool
 --verifySK3 sk ps = all (== sk) [getSubkey sk x | x <- ps]
 
+getSubkey :: Word8 -> [PCPair] -> Int -> Word8
+getSubkey wk pairs keyNo = case keyNo `mod` 2 of
+                            0 -> getSubkeyEven wk pairs keyNo
+                            --1 -> getSubkeyOdd wk pairs keyNo
 
 -- Find the first subkey byte from a plaintext ciphertext pair and a given
 -- whitening guess. You must specify the subkey to find, [1..4].
-getSubkey :: Word8 -> [PCPair] -> Int -> Word8
-getSubkey wk pairs keyNo = let ca = snd $ pairs !! ((keyNo * 2 - 1) `mod` 8) -- 0th
-                               cb = snd $ pairs !! (keyNo * 2 `mod` 8) -- 7th
-                               -- Undo the last whitening performed on c
-                               ca' = (ca - wk)
-                               fOut = f0 cb
-                               p = fst $ pairs !! (keyNo * 2 `mod` 8)
-                               x' = ca' `xor` p
-                           in 
-                              (fOut - x')
+getSubkeyEven :: Word8 -> [PCPair] -> Int -> Word8
+getSubkeyEven wk pairs keyNo = let ca = snd $ pairs !! ((keyNo * 2 - 1) `mod` 8) -- 0th byte
+                                   cb = snd $ pairs !! (keyNo * 2 `mod` 8) -- 7th byte
+                                   -- Undo the last whitening performed on c
+                                   ca' = (ca - wk)
+                                   fOut = f0 cb
+                                   p = fst $ pairs !! (keyNo * 2 `mod` 8)
+                                   x' = ca' `xor` p
+                               in 
+                                  (fOut - x')
                          
 
 --getSubkey wk pairs keyNo = let c = snd $ pairs !! ((keyNo * 2 - 1) `mod` 8)
@@ -94,7 +98,7 @@ getSubkey wk pairs keyNo = let ca = snd $ pairs !! ((keyNo * 2 - 1) `mod` 8) -- 
 --                               x' = c' `xor` p
 --                           in 
 --                              (fOut - x')
---
+
 -- Performs the f0 function on a byte
 --
 f0 :: Word8 -> Word8
