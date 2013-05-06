@@ -23,7 +23,7 @@ main = do args <- getArgs
             (do h <- openFile (head args) ReadMode
                 contents <- hGetContents h
                 let pairs = loadPairs contents
-                let sk = findCorrectSK pairs
+                let sk = findCorrectSK $ tail pairs
                 putStrLn (showHex sk "")
                 -- sequence_ $ map (\x -> do putStr (fst x) 
                 --                           putStr ","
@@ -58,7 +58,7 @@ makePCPairs (l, r) = let parseHex = fst . head . readHex
                              zip ls rs
 
 findCorrectSK :: [[PCPair]] -> Word8
-findCorrectSK pairs = let sks = [[getSubkey wk p 4 | p <- pairs] | wk <- possibleKeys]
+findCorrectSK pairs = let sks = [[getSubkey wk p 3 | p <- pairs] | wk <- possibleKeys]
                           valid = [all (== (head sk)) sk | sk <- sks] 
                           Just ind = elemIndex True valid
                       in 
@@ -69,13 +69,16 @@ findCorrectSK pairs = let sks = [[getSubkey wk p 4 | p <- pairs] | wk <- possibl
 --verifySK3 :: Word8 -> [[PCPair]] -> Bool
 --verifySK3 sk ps = all (== sk) [getSubkey sk x | x <- ps]
 
+-- Find the a subkey byte from a plaintext ciphertext pair and a given
+-- whitening guess. You must specify the subkey to find, [1..4].
 getSubkey :: Word8 -> [PCPair] -> Int -> Word8
 getSubkey wk pairs keyNo = case keyNo `mod` 2 of
                             0 -> getSubkeyEven wk pairs keyNo
-                            --1 -> getSubkeyOdd wk pairs keyNo
+                            1 -> getSubkeyOdd wk pairs keyNo
 
--- Find the first subkey byte from a plaintext ciphertext pair and a given
--- whitening guess. You must specify the subkey to find, [1..4].
+-- Find the a subkey byte from a plaintext ciphertext pair and a given
+-- whitening guess. You must specify the subkey to find, [1..4]. This function
+-- is for the 'Even' pairs, e.g. the ones where f0 is used.
 getSubkeyEven :: Word8 -> [PCPair] -> Int -> Word8
 getSubkeyEven wk pairs keyNo = let ca = snd $ pairs !! ((keyNo * 2 - 1) `mod` 8) -- 0th byte
                                    cb = snd $ pairs !! (keyNo * 2 `mod` 8) -- 7th byte
@@ -87,17 +90,19 @@ getSubkeyEven wk pairs keyNo = let ca = snd $ pairs !! ((keyNo * 2 - 1) `mod` 8)
                                in 
                                   (fOut - x')
                          
-
---getSubkey wk pairs keyNo = let c = snd $ pairs !! ((keyNo * 2 - 1) `mod` 8)
---                               x = snd $ pairs !! (keyNo * 2 `mod` 8)
---                               -- Undo the last whitening performed on c0
---                               c' = (c - wk)
---                               -- What came out of f0 for X6 0f the plaintext
---                               fOut = f0 x
---                               p = fst $ head pairs
---                               x' = c' `xor` p
---                           in 
---                              (fOut - x')
+-- Find the a subkey byte from a plaintext ciphertext pair and a given
+-- whitening guess. You must specify the subkey to find, [1..4]. This function
+-- is for the 'Odd' pairs, e.g. the ones where f1 is used.
+getSubkeyOdd :: Word8 -> [PCPair] -> Int -> Word8
+getSubkeyOdd wk pairs keyNo = let ca = snd $ pairs !! ((keyNo * 2 - 1) `mod` 8) -- 0th byte
+                                  cb = snd $ pairs !! (keyNo * 2 `mod` 8) -- 7th byte
+                                  -- Undo the last whitening performed on c
+                                  ca' = (ca `xor` wk)
+                                  fOut = f1 cb
+                                  p = fst $ pairs !! (keyNo * 2 `mod` 8)
+                                  x' = ca' - p
+                              in 
+                                 (fOut `xor` x')
 
 -- Performs the f0 function on a byte
 --
