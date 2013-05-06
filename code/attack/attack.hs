@@ -23,7 +23,8 @@ main = do args <- getArgs
             (do h <- openFile (head args) ReadMode
                 contents <- hGetContents h
                 let pairs = loadPairs contents
-                return ()
+                let sk = findCorrectSK pairs
+                putStrLn (showHex sk "")
                 -- sequence_ $ map (\x -> do putStr (fst x) 
                 --                           putStr ","
                 --                           putStrLn (snd x)) pairs 
@@ -39,7 +40,7 @@ parsePair str = let (x, y) = span (/= ',') str
                 in
                 (x, tail y)
                 
--- A list of all possible subkeys
+-- A list of all possible whitening keys
 possibleKeys = [0..255]
 
 -- This function will make plain-text cipher-text byte from a Pair for testing
@@ -56,13 +57,33 @@ makePCPairs (l, r) = let parseHex = fst . head . readHex
                          in
                              zip ls rs
 
+findCorrectSK :: [[PCPair]] -> Word8
+findCorrectSK pairs = let sks = [[getSubkey wk p | p <- pairs] | wk <- possibleKeys]
+                          valid = [all (== (head sk)) sk | sk <- sks] 
+                          Just ind = elemIndex True valid
+                      in 
+                      head (sks !! ind)
+                      
+
+-- Verify that this subkey is correct across all plaintext/ciphertext pairs
+--verifySK3 :: Word8 -> [[PCPair]] -> Bool
+--verifySK3 sk ps = all (== sk) [getSubkey sk x | x <- ps]
+
+
 -- Find the first subkey byte from a plaintext ciphertext pair and a given
--- whitening guess
---getSubkey :: [PCPair] -> Int
---getSubkey wk pairs = let c0 = snd $ last pairs
---                         x7 = snd $ head pairs
---                         x0 = (c0 - wk) `mod` 256
---                         in
+-- whitening guess. You must specify the subkey to find, [1..4].
+getSubkey :: Word8 -> [PCPair] -> Word8
+getSubkey wk pairs = let c0 = snd $ last pairs
+                         x7 = snd $ head pairs
+                         -- Undo the last whitening performed on c0
+                         c0' = (c0 - wk)
+                         -- What came out of f0 for X6 0f the plaintext
+                         fOut = f0 x7
+                         p7 = fst $ head pairs
+                         x0' = c0' `xor` p7
+                         in 
+                          (fOut - x0')
+                         
 
 -- Performs the f0 function on a byte
 f0 :: Word8 -> Word8
