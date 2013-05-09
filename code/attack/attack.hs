@@ -7,6 +7,7 @@ import Data.List
 import Data.Bits
 import Data.Word
 import Numeric
+import Text.Printf
 import System.Environment
 import System.IO
 
@@ -24,7 +25,7 @@ main = do args <- getArgs
                 contents <- hGetContents h
                 let pairs = loadPairs contents
                 let sk = [findCorrectSK pairs x | x <- [4,3,2,1]]
-                let sk' = map (concat . map (\x -> showHex x "")) $ transpose sk
+                let sk' = map (concat . map (\x -> printf "%02x" x)) $ transpose sk
                 putStr $ unlines sk' 
             )
 
