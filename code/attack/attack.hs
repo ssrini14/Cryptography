@@ -23,12 +23,9 @@ main = do args <- getArgs
             (do h <- openFile (head args) ReadMode
                 contents <- hGetContents h
                 let pairs = loadPairs contents
-                let sk = concat $ map (\x -> showHex x "") [findCorrectSK pairs x | x <- [4,3,2,1]]
-                --let sk = showHex (findCorrectSK pairs 4) "" 
-                putStrLn sk 
-                -- sequence_ $ map (\x -> do putStr (fst x) 
-                --                           putStr ","
-                --                           putStrLn (snd x)) pairs 
+                let sk = [findCorrectSK pairs x | x <- [4,3,2,1]]
+                let sk' = map (concat . map (\x -> showHex x "")) $ transpose sk
+                putStr $ unlines sk' 
             )
 
 
@@ -56,15 +53,17 @@ makePCPairs (l, r) = let parseHex = fst . head . readHex
                          rs = makeTwos r
                          ls = makeTwos l
                          in
-                             zip ls rs
+                            zip ls rs
 
--- Find the correct subkey no. b in the list of pairs.
-findCorrectSK :: [[PCPair]] -> Int -> Word8
+-- Find the correct subkeys for byte b in the list of pairs.
+findCorrectSK :: [[PCPair]] -> Int -> [Word8]
 findCorrectSK pairs b = let sks = [[getSubkey wk p b | p <- pairs] | wk <- possibleKeys]
-                            valid = [all (== (head sk)) sk | sk <- sks] 
-                            Just ind = elemIndex True valid
+                            -- Filter out the lists where the same whitening key
+                            -- guess yields a different answer
+                            valid = map head $ filter (\(x:xs) -> all (== x) xs) sks 
+                            ind = elemIndices True $ map (\x -> all (== (head x)) x) sks
                         in 
-                          head (sks !! ind)
+                          valid
 
 -- Find the a subkey byte from a plaintext ciphertext pair and a given
 -- whitening guess. You must specify the subkey to find, [1..4].
@@ -77,12 +76,14 @@ getSubkey wk pairs keyNo = case keyNo `mod` 2 of
 -- whitening guess. You must specify the subkey to find, [1..4]. This function
 -- is for the 'Even' pairs, e.g. the ones where f0 is used.
 getSubkeyEven :: Word8 -> [PCPair] -> Int -> Word8
-getSubkeyEven wk pairs keyNo = let ca = snd $ pairs !! ((keyNo * 2 - 1) `mod` 8) -- 0th byte
-                                   cb = snd $ pairs !! (keyNo * 2 `mod` 8) -- 7th byte
+getSubkeyEven wk pairs keyNo = let b1 = keyNo * 2 - 1 `mod` 8
+                                   b2 = keyNo * 2 `mod` 8
+                                   ca = snd $ pairs !! b1 -- 0th byte
+                                   cb = snd $ pairs !! b2 -- 7th byte
                                    -- Undo the last whitening performed on c
                                    ca' = (ca - wk)
                                    fOut = (f0 cb)
-                                   p = fst $ pairs !! (keyNo * 2 `mod` 8)
+                                   p = fst $ pairs !! b1 
                                    x' = ca' `xor` p
                                in 
                                   (x' - fOut)
@@ -91,12 +92,14 @@ getSubkeyEven wk pairs keyNo = let ca = snd $ pairs !! ((keyNo * 2 - 1) `mod` 8)
 -- whitening guess. You must specify the subkey to find, [1..4]. This function
 -- is for the 'Odd' pairs, e.g. the ones where f1 is used.
 getSubkeyOdd :: Word8 -> [PCPair] -> Int -> Word8
-getSubkeyOdd wk pairs keyNo = let ca = snd $ pairs !! ((keyNo * 2 - 1) `mod` 8) -- 0th byte
-                                  cb = snd $ pairs !! (keyNo * 2 `mod` 8) -- 7th byte
+getSubkeyOdd wk pairs keyNo = let b1 = (7 - (keyNo * 2 - 1 `mod` 8))
+                                  b2 = (7 - (keyNo * 2 `mod` 8))
+                                  ca = snd $ pairs !! b2 -- 5th byte
+                                  cb = snd $ pairs !! b1  -- 6th byte
                                   -- Undo the last whitening performed on c
                                   ca' = (ca `xor` wk)
                                   fOut = f1 cb
-                                  p = fst $ pairs !! ((keyNo * 2) `mod` 8)
+                                  p = fst $ pairs !! (b1 `mod` 8)
                                   x' = ca' - p
                               in 
                                  (fOut `xor` x')
